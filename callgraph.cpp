@@ -1,5 +1,4 @@
 #include "callgraph.h"
-const char *caller;
 
 enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
@@ -30,7 +29,7 @@ int Graph::indexOfNode(string node)
 	throw "No such node: " + node;
 }
 
-
+string CallGraph::currentCaller; //http://stackoverflow.com/questions/272900/vectorpush-back-odr-uses-the-value-causing-undefined-reference-to-static-clas
 
 CallGraph::CallGraph(int argc, const char * argv[])
 {
@@ -69,12 +68,12 @@ enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClient
         clang_getPresumedLocation(location, &filename, &line, &column);
         
         //printf("%s : %s, (%i,%i)\n",clang_getCString(name),clang_getCString(filename),line,column);
-        caller = clang_getCString(name);
+        CallGraph::currentCaller = clang_getCString(name);
         return CXChildVisit_Recurse;
     }
     else if (kind == CXCursor_CallExpr)
     {
-    	printf("call %s -> %s\n", caller, clang_getCString(name));
+    	printf("call %s -> %s\n", CallGraph::currentCaller.c_str(), clang_getCString(name));
     	return CXChildVisit_Recurse;
     }
     return CXChildVisit_Recurse;

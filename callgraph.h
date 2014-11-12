@@ -25,7 +25,8 @@ public:
 	CallGraph (int argc, const char * argv[]);
 	Graph *directGraph;
 	Graph *transitiveClosureGraph();
+	static string currentCaller; // Global state here due to problems with c->c++ member callbacks
+
 private:
 	Graph mTransitiveClosureGraph;
-	//enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
 };

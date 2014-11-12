@@ -11,7 +11,7 @@ void printCursorTokens(CXTranslationUnit translationUnit,CXCursor currentCursor)
 enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
 enum CXChildVisitResult functionDeclVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
-char *caller;
+const char *caller;
 
 int main (int argc, const char * argv[])
 {

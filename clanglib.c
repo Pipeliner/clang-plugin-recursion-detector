@@ -1,14 +1,16 @@
-#include <iostream>
+//#include <iostream>
 #include <clang-c/Index.h>
 #include <clang-c/Platform.h>
+#include <stdio.h>
+
 
 
 void printDiagnostics(CXTranslationUnit translationUnit);
 void printTokenInfo(CXTranslationUnit translationUnit,CXToken currentToken);
 void printCursorTokens(CXTranslationUnit translationUnit,CXCursor currentCursor);
 
-CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
-CXChildVisitResult functionDeclVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
+enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
+enum CXChildVisitResult functionDeclVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
 int main (int argc, const char * argv[])
 {
@@ -99,9 +101,9 @@ void printCursorTokens(CXTranslationUnit translationUnit,CXCursor currentCursor)
     clang_disposeTokens(translationUnit,tokens,nbTokens);
 }
 
-CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data){
+enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data){
     
-    CXCursorKind kind = clang_getCursorKind(cursor);
+    enum CXCursorKind kind = clang_getCursorKind(cursor);
     CXString name = clang_getCursorSpelling(cursor);
     if (kind == CXCursor_FunctionDecl || kind == CXCursor_ObjCInstanceMethodDecl)
     {
@@ -128,8 +130,8 @@ CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData 
     return CXChildVisit_Recurse;
 }
 
-CXChildVisitResult functionDeclVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data){
-    CXCursorKind kind = clang_getCursorKind(cursor);
+enum CXChildVisitResult functionDeclVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data){
+    enum CXCursorKind kind = clang_getCursorKind(cursor);
     CXType type = clang_getCursorType(cursor);
     
     if (kind == CXCursor_ParmDecl){

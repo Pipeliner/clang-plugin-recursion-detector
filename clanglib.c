@@ -11,6 +11,8 @@ void printCursorTokens(CXTranslationUnit translationUnit,CXCursor currentCursor)
 enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
 enum CXChildVisitResult functionDeclVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
+char *caller;
+
 int main (int argc, const char * argv[])
 {
     CXIndex index = clang_createIndex(0, 0);
@@ -55,12 +57,13 @@ enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClient
         
         clang_getPresumedLocation(location, &filename, &line, &column);
         
-        printf("%s : %s, (%i,%i)\n",clang_getCString(name),clang_getCString(filename),line,column);
+        //printf("%s : %s, (%i,%i)\n",clang_getCString(name),clang_getCString(filename),line,column);
+        caller = clang_getCString(name);
         return CXChildVisit_Recurse;
     }
     else if (kind == CXCursor_CallExpr)
     {
-    	printf("call '%s'\n", clang_getCString(name));
+    	printf("call %s -> %s\n", caller, clang_getCString(name));
     	return CXChildVisit_Recurse;
     }
     return CXChildVisit_Recurse;

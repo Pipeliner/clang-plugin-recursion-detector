@@ -2,8 +2,9 @@
 #include <clang-c/Index.h>
 #include <clang-c/Platform.h>
 #include <stdio.h>
+#include <string>
 
-
+typedef std::string string;
 
 void printTokenInfo(CXTranslationUnit translationUnit,CXToken currentToken);
 void printCursorTokens(CXTranslationUnit translationUnit,CXCursor currentCursor);
@@ -12,35 +13,83 @@ enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClient
 enum CXChildVisitResult functionDeclVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
 const char *caller;
+const int MAX_NODES = 100;
 
-int main (int argc, const char * argv[])
+class Graph
 {
-    CXIndex index = clang_createIndex(0, 0);
+public:
+	int nodesCount;
+	string nodes[MAX_NODES];
+	int edges[MAX_NODES][MAX_NODES];
+	void addNode(string node);
+	void addEdge(string src, string dst);
+private:
+	int indexOfNode(string node);
+};
+
+void Graph::addNode(string node)
+{
+	for (int i = 0; i < nodesCount; i++)
+		if (nodes[i] == node)
+			return;
+
+	//new node
+	if (nodesCount == MAX_NODES)
+		throw "Too many edges";
+
+	nodes[nodesCount++] = node;
+}
+
+void Graph::addEdge(string src, string dst)
+{
+	edges[indexOfNode(src)][indexOfNode(dst)] = 1;
+}
+
+int Graph::indexOfNode(string node)
+{
+	for (int i = 0; i < nodesCount; i++)
+		if (nodes[i] == node)
+			return i;
+
+	throw "No such node: " + node;
+}
+
+class CallGraph
+{
+public:
+	CallGraph (int argc, const char * argv[]);
+	Graph *directGraph;
+	Graph *transitiveClosureGraph();
+private:
+	Graph mTransitiveClosureGraph;
+};
+
+CallGraph::CallGraph(int argc, const char * argv[])
+{
+	CXIndex index = clang_createIndex(0, 0);
     
-    if(index == 0){
-        fprintf(stderr, "error creating index\n");
-        return 1;
-    }
+    if(index == 0)
+        throw "Error creating index";
+
 
     CXTranslationUnit translationUnit = clang_parseTranslationUnit(index, 0,
                                                       argv, argc, 0, 0, CXTranslationUnit_None);
     
-    if(translationUnit == 0){
-        fprintf(stderr, "error creating translationUnit\n");
-        return 1;
-    }
-    
-
+    if(translationUnit == 0)
+        throw "Error creating translationUnit\n";
     
     CXCursor rootCursor = clang_getTranslationUnitCursor(translationUnit);
-    
-    //printCursorTokens(translationUnit,rootCursor);
-    
+
     unsigned int res = clang_visitChildren(rootCursor, *cursorVisitor,0);
     
     clang_disposeTranslationUnit(translationUnit);
     clang_disposeIndex(index);
-    return 0;
+
+}
+
+int main (int argc, const char * argv[])
+{
+	CallGraph graph(argc, argv);
 }
 
 enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data){

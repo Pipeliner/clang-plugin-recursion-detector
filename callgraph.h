@@ -26,9 +26,9 @@ class CallGraph
 public:
 	CallGraph (int argc, const char * argv[]);
 	static Graph *directGraph;
-	static Graph *transitiveClosureGraph();
+	Graph *transitiveClosureGraph();
 	static string currentCaller; // Global state here due to problems with c->c++ member callbacks
 
 private:
-	Graph mTransitiveClosureGraph;
+	Graph *mTransitiveClosureGraph;
 };

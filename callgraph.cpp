@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iterator>
 #include "callgraph.h"
 
 enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
@@ -10,7 +11,8 @@ Graph::Graph()
     for (int src = 0; src < MAX_NODES; src++)
         for (int dst = 0; dst < MAX_NODES; dst++)
             edges[src][dst] = 0;
-\
+    nodesCount = 0;
+
 }
 
 void Graph::addNode(string node)
@@ -62,6 +64,7 @@ Graph *CallGraph::directGraph;
 CallGraph::CallGraph(int argc, const char * argv[])
 {
     directGraph = new Graph();
+    mTransitiveClosureGraph = 0;
 	CXIndex index = clang_createIndex(0, 0);
     
     if(index == 0)
@@ -82,6 +85,29 @@ CallGraph::CallGraph(int argc, const char * argv[])
     clang_disposeIndex(index);
 
 }
+
+Graph *CallGraph::transitiveClosureGraph()
+{
+    if (mTransitiveClosureGraph == 0)
+    {
+        mTransitiveClosureGraph = new Graph;
+        int n = directGraph->nodesCount;
+        mTransitiveClosureGraph->nodesCount = n;
+        for (int i = 0; i < n; i++)
+            mTransitiveClosureGraph->nodes[i] = directGraph->nodes[i];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                mTransitiveClosureGraph->edges[i][j] = directGraph->edges[i][j];
+        //Floyd
+        for (int k = 0; k < n; k++)
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < n; j++)
+                    mTransitiveClosureGraph->edges[i][j] |= (mTransitiveClosureGraph->edges[i][k] && mTransitiveClosureGraph->edges[k][j]);
+    }
+
+    return mTransitiveClosureGraph;
+}
+
 enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data){
     
     enum CXCursorKind kind = clang_getCursorKind(cursor);

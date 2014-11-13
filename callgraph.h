@@ -16,6 +16,7 @@ public:
 	int edges[MAX_NODES][MAX_NODES];
 	void addNode(string node);
 	void addEdge(string src, string dst);
+	void printMatrix();
 private:
 	int indexOfNode(string node);
 };

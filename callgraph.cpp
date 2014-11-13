@@ -1,3 +1,4 @@
+#include <iostream>
 #include "callgraph.h"
 
 enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data);
@@ -28,6 +29,22 @@ void Graph::addNode(string node)
 void Graph::addEdge(string src, string dst)
 {
 	edges[indexOfNode(src)][indexOfNode(dst)] = 1;
+}
+
+void Graph::printMatrix()
+{
+    std::cout << "  ";
+    for (int dst = 0; dst < nodesCount; dst++)
+        std::cout << nodes[dst];
+    std::cout << std::endl;
+    for (int src = 0; src < nodesCount; src++)
+    {
+        std::cout << nodes[src] << " ";
+        for (int dst = 0; dst < nodesCount; dst++)
+            std::cout << edges[src][dst];
+
+        std::cout << std::endl;
+    }
 }
 
 int Graph::indexOfNode(string node)

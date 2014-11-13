@@ -10,6 +10,7 @@ const int MAX_NODES = 100;
 class Graph
 {
 public:
+	Graph();
 	int nodesCount;
 	string nodes[MAX_NODES];
 	int edges[MAX_NODES][MAX_NODES];
@@ -23,8 +24,8 @@ class CallGraph
 {
 public:
 	CallGraph (int argc, const char * argv[]);
-	Graph *directGraph;
-	Graph *transitiveClosureGraph();
+	static Graph *directGraph;
+	static Graph *transitiveClosureGraph();
 	static string currentCaller; // Global state here due to problems with c->c++ member callbacks
 
 private:

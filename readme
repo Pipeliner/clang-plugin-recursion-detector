@@ -1,0 +1,1 @@
+detect all potentially recursive functions in a C program, using the Clang compiler front-end

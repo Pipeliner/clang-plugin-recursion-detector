@@ -61,20 +61,22 @@ int Graph::indexOfNode(string node)
 string CallGraph::currentCaller; //http://stackoverflow.com/questions/272900/vectorpush-back-odr-uses-the-value-causing-undefined-reference-to-static-clas
 Graph *CallGraph::directGraph;
 
-CallGraph::CallGraph(int argc, const char * argv[])
+CallGraph::CallGraph(const std::string fileName)
 {
     directGraph = new Graph();
     mTransitiveClosureGraph = 0;
 	CXIndex index = clang_createIndex(0, 0);
     
-    if(index == 0)
+    if (index == 0)
         throw "Error creating index";
 
 
+    const char* const clang_argv[] = {fileName.c_str()};
+    const int clang_argc = 1;
     CXTranslationUnit translationUnit = clang_parseTranslationUnit(index, 0,
-                                                      argv, argc, 0, 0, CXTranslationUnit_None);
+                                                      clang_argv, clang_argc, 0, 0, CXTranslationUnit_None);
     
-    if(translationUnit == 0)
+    if (translationUnit == 0)
         throw "Error creating translationUnit\n";
     
     CXCursor rootCursor = clang_getTranslationUnitCursor(translationUnit);
@@ -108,7 +110,7 @@ Graph *CallGraph::transitiveClosureGraph()
     return mTransitiveClosureGraph;
 }
 
-enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data){
+enum CXChildVisitResult cursorVisitor(CXCursor cursor, CXCursor parent, CXClientData client_data) {
     
     enum CXCursorKind kind = clang_getCursorKind(cursor);
     CXString name = clang_getCursorSpelling(cursor);

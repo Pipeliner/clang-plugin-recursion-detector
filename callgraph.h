@@ -24,7 +24,7 @@ private:
 class CallGraph
 {
 public:
-	CallGraph (int argc, const char * argv[]);
+	CallGraph (const std::string fileName);
 	static Graph *directGraph;
 	Graph *transitiveClosureGraph();
 	static string currentCaller; // Global state here due to problems with c->c++ member callbacks
